@@ -95,12 +95,14 @@ const login = async (req, res) => {
     res.status(500).json({ message: "server error" });
   }
 };
+const isProduction = process.env.NODE_ENV === "production";
 const logout = (req, res) => {
   try {
     res.clearCookie("token", {
       httpOnly: true,
-      secure: true,
-      sameSite: "Strict",
+      secure: isProduction,
+      sameSite: isProduction ? "None" : "Lax",
+      path: "/",
     });
     res.status(200).json({ message: "Logout successfull." });
   } catch (error) {
