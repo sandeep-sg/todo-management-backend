@@ -28,8 +28,29 @@ const signup = async (req, res) => {
       throw new Error("All fields are required");
     }
     const isUserExist = await User.findOne({ email });
-    if (isUserExist)
-      return res.status(400).json({ message: "User already exist." });
+    if (isUserExist) {
+      if (!isUserExist.isVerified) {
+        const verificationToken = Math.floor(
+          Math.random() * 900000 + 100000
+        ).toString();
+        isUserExist.verificationToken = verificationToken;
+        isUserExist.verificationTokenExpiresAt = Date.now() + 10 * 60 * 1000;
+        await isUserExist.save();
+
+        await sendVerificationCode(
+          email,
+          "Email verification",
+          verificationToken
+        );
+
+        return res.status(200).json({
+          message:
+            "Account exists but not verified. Verification code re-sent to your email.",
+        });
+      } else {
+        return res.status(400).json({ message: "User already exists." });
+      }
+    }
     const hashPassword = await hashPasswordGenrate(password);
     const verificationToken = Math.floor(
       Math.random() * 900000 + 100000
@@ -66,6 +87,7 @@ const verifyEmail = async (req, res) => {
     user.verificationToken = undefined;
     user.verificationTokenExpiresAt = undefined;
     await user.save();
+    generateTokenAndSetCookie(res, user._id);
     res.status(200).json({ message: "Verification has been successfull." });
   } catch (error) {
     console.log(error);

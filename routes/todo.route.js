@@ -7,16 +7,17 @@ import {
   updateTodo,
   updateTodoStatus,
 } from "../controller/todo.controller.js";
-import verifyToken from '../middleware/verifyToken.js'
+import verifyToken from "../middleware/verifyToken.js";
+import isUserVerified from "../middleware/isUserVerified.js";
 
 const todoRouter = express.Router();
 // todo Routes
 // todoRouter.use(verifyToken)
-todoRouter.post("/",verifyToken, createTodo);
-todoRouter.get("/",verifyToken, getAllTodos);
-todoRouter.get("/:id",verifyToken, getTodo);
-todoRouter.delete("/:id",verifyToken, deleteTodo);
-todoRouter.put("/:id",verifyToken,updateTodo);
-todoRouter.patch("/:id",verifyToken,updateTodoStatus);
+todoRouter.post("/", verifyToken, isUserVerified, createTodo);
+todoRouter.get("/", verifyToken, isUserVerified, getAllTodos);
+todoRouter.get("/:id", verifyToken, isUserVerified, getTodo);
+todoRouter.delete("/:id", verifyToken, isUserVerified, deleteTodo);
+todoRouter.put("/:id", verifyToken, isUserVerified, updateTodo);
+todoRouter.patch("/:id", verifyToken, isUserVerified, updateTodoStatus);
 
 export default todoRouter;
