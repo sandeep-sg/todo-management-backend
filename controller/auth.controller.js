@@ -87,7 +87,7 @@ const verifyEmail = async (req, res) => {
     user.verificationToken = undefined;
     user.verificationTokenExpiresAt = undefined;
     await user.save();
-    generateTokenAndSetCookie(res, user._id);
+    genrateTokenAndSetCookie(res, user._id);
     res.status(200).json({ message: "Verification has been successfull." });
   } catch (error) {
     console.log(error);
